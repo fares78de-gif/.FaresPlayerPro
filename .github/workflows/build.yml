@@ -1,0 +1,41 @@
+
+name: Build Fares Player Pro
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'Fares_Player_Pro_Source.zip'
+      - '.github/workflows/build.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Extract project
+        run: unzip -q Fares_Player_Pro_Source.zip
+
+      - name: Build APK
+        working-directory: FaresPlayerPro
+        run: gradle assembleDebug --no-daemon
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Fares-Player-Pro-APK
+          path: FaresPlayerPro/app/build/outputs/apk/debug/*.apk
